@@ -3,14 +3,15 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   ScrollView,
   Image,
   Alert,
   Modal,
   RefreshControl,
+  TextInput,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { scanHistoryService, ScanHistoryItem } from '../services/scanHistoryService';
@@ -23,6 +24,9 @@ export default function ScanHistoryScreen() {
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<ScanHistoryItem | null>(null);
   const [showDetail, setShowDetail] = useState(false);
+  const [editingItem, setEditingItem] = useState<ScanHistoryItem | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editedFoodName, setEditedFoodName] = useState('');
   const [statistics, setStatistics] = useState({
     totalScans: 0,
     averageScore: 0,
@@ -111,6 +115,35 @@ export default function ScanHistoryScreen() {
     );
   };
 
+  const handleEditFoodName = (item: ScanHistoryItem) => {
+    setEditingItem(item);
+    setEditedFoodName(item.analysisResult.foodName);
+    setShowEditModal(true);
+  };
+
+  const handleSaveEditedName = async () => {
+    if (!editingItem || !editedFoodName.trim()) {
+      Alert.alert('錯誤', '請輸入有效的食物名稱');
+      return;
+    }
+
+    try {
+      await scanHistoryService.updateFoodName(editingItem.id, editedFoodName.trim());
+      await loadHistory();
+      setShowEditModal(false);
+      setEditingItem(null);
+      setEditedFoodName('');
+    } catch (error) {
+      Alert.alert('錯誤', '更新食物名稱失敗');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setShowEditModal(false);
+    setEditingItem(null);
+    setEditedFoodName('');
+  };
+
   const getSugarFriendlyColor = (score: number) => {
     if (score >= 8) return '#4CAF50';
     if (score >= 6) return '#FF9800';
@@ -149,12 +182,20 @@ export default function ScanHistoryScreen() {
       <View style={styles.cardContent}>
         <View style={styles.cardHeader}>
           <Text style={styles.foodName}>{item.analysisResult.foodName}</Text>
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={() => handleDeleteItem(item.id)}
-          >
-            <Ionicons name="trash" size={16} color="#999" />
-          </TouchableOpacity>
+          <View style={styles.cardActions}>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => handleEditFoodName(item)}
+            >
+              <Ionicons name="pencil" size={16} color="#4CAF50" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleDeleteItem(item.id)}
+            >
+              <Ionicons name="trash" size={16} color="#999" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <Text style={styles.foodCategory}>{item.analysisResult.category}</Text>
@@ -210,6 +251,40 @@ export default function ScanHistoryScreen() {
         </View>
       )}
     </View>
+  );
+
+  const EditModal = () => (
+    <Modal visible={showEditModal} animationType="slide" transparent>
+      <View style={styles.editModalOverlay}>
+        <View style={styles.editModalContainer}>
+          <Text style={styles.editModalTitle}>編輯食物名稱</Text>
+
+          <TextInput
+            style={styles.editInput}
+            value={editedFoodName}
+            onChangeText={setEditedFoodName}
+            placeholder="輸入食物名稱"
+            autoFocus
+            maxLength={50}
+          />
+
+          <View style={styles.editModalActions}>
+            <TouchableOpacity
+              style={[styles.editModalButton, styles.cancelButton]}
+              onPress={handleCancelEdit}
+            >
+              <Text style={styles.cancelButtonText}>取消</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.editModalButton, styles.saveButton]}
+              onPress={handleSaveEditedName}
+            >
+              <Text style={styles.saveButtonText}>保存</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
   );
 
   const DetailModal = () => (
@@ -328,33 +403,6 @@ export default function ScanHistoryScreen() {
         </TouchableOpacity>
       </View>
 
-      {statistics.totalScans > 0 && <StatisticsCard />}
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.filterContainer}
-        contentContainerStyle={styles.filterContent}
-      >
-        {filterOptions.map((filter) => (
-          <TouchableOpacity
-            key={filter}
-            style={[
-              styles.filterButton,
-              selectedFilter === filter && styles.activeFilterButton
-            ]}
-            onPress={() => handleFilterChange(filter)}
-          >
-            <Text style={[
-              styles.filterText,
-              selectedFilter === filter && styles.activeFilterText
-            ]}>
-              {filter}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
       <ScrollView
         style={styles.content}
         refreshControl={
@@ -365,6 +413,33 @@ export default function ScanHistoryScreen() {
           />
         }
       >
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.filterContainer}
+          contentContainerStyle={styles.filterContent}
+        >
+          {filterOptions.map((filter) => (
+            <TouchableOpacity
+              key={filter}
+              style={[
+                styles.filterButton,
+                selectedFilter === filter && styles.activeFilterButton
+              ]}
+              onPress={() => handleFilterChange(filter)}
+            >
+              <Text style={[
+                styles.filterText,
+                selectedFilter === filter && styles.activeFilterText
+              ]}>
+                {filter}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {statistics.totalScans > 0 && <StatisticsCard />}
+
         {filteredHistory.length > 0 ? (
           filteredHistory.map((item) => (
             <HistoryCard key={item.id} item={item} />
@@ -380,6 +455,7 @@ export default function ScanHistoryScreen() {
         )}
       </ScrollView>
 
+      <EditModal />
       <DetailModal />
     </SafeAreaView>
   );
@@ -413,7 +489,8 @@ const styles = StyleSheet.create({
   },
   statsCard: {
     backgroundColor: '#fff',
-    margin: 20,
+    marginHorizontal: 0,
+    marginBottom: 20,
     padding: 20,
     borderRadius: 15,
     elevation: 2,
@@ -474,17 +551,21 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     backgroundColor: '#fff',
-    paddingVertical: 10,
+    paddingVertical: 15,
+    marginBottom: 10,
+    height: 60,
   },
   filterContent: {
     paddingHorizontal: 20,
   },
   filterButton: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderRadius: 20,
     backgroundColor: '#f0f0f0',
     marginRight: 10,
+    height: 40,
+    justifyContent: 'center',
   },
   activeFilterButton: {
     backgroundColor: '#4CAF50',
@@ -531,6 +612,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     flex: 1,
+  },
+  cardActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  editButton: {
+    padding: 5,
+    marginRight: 5,
   },
   deleteButton: {
     padding: 5,
@@ -707,5 +796,61 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     flex: 1,
     lineHeight: 18,
+  },
+  editModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editModalContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 20,
+    width: '80%',
+    maxWidth: 300,
+  },
+  editModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  editInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 20,
+    color: '#333',
+  },
+  editModalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  editModalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#f0f0f0',
+    marginRight: 10,
+  },
+  saveButton: {
+    backgroundColor: '#4CAF50',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '500',
+  },
+  saveButtonText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: '500',
   },
 });

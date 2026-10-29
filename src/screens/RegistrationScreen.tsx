@@ -5,14 +5,19 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types/navigation';
+
+type RegistrationScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 export default function RegistrationScreen() {
   const [formData, setFormData] = useState({
@@ -25,6 +30,7 @@ export default function RegistrationScreen() {
   const [loading, setLoading] = useState(false);
 
   const { register } = useAuth();
+  const navigation = useNavigation<RegistrationScreenNavigationProp>();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -143,9 +149,19 @@ export default function RegistrationScreen() {
             <View style={styles.terms}>
               <Text style={styles.termsText}>
                 繼續代表您同意我們的
-                <Text style={styles.termsLink}>服務條款</Text>
+                <Text
+                  style={styles.termsLink}
+                  onPress={() => navigation.navigate('TermsOfService' as never)}
+                >
+                  服務條款
+                </Text>
                 及
-                <Text style={styles.termsLink}>隱私政策</Text>
+                <Text
+                  style={styles.termsLink}
+                  onPress={() => navigation.navigate('PrivacyPolicy' as never)}
+                >
+                  隱私政策
+                </Text>
               </Text>
             </View>
           </View>
@@ -166,58 +182,61 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     paddingTop: 60,
-    paddingBottom: 40,
+    paddingBottom: 50,
   },
   title: {
-    fontSize: 28,
+    fontSize: 36,
     fontWeight: 'bold',
     color: '#333',
-    marginTop: 20,
+    marginTop: 25,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 20,
     color: '#666',
-    marginTop: 10,
+    marginTop: 15,
   },
   form: {
-    paddingHorizontal: 30,
+    paddingHorizontal: 40,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: '#e0e0e0',
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 25,
     backgroundColor: '#f9f9f9',
+    minHeight: 60,
   },
   input: {
     flex: 1,
-    marginLeft: 10,
-    fontSize: 16,
+    marginLeft: 15,
+    fontSize: 18,
+    color: '#333',
   },
   registerButton: {
     backgroundColor: '#4CAF50',
-    borderRadius: 12,
-    padding: 18,
+    borderRadius: 15,
+    padding: 22,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 30,
+    minHeight: 60,
   },
   registerButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   terms: {
-    marginTop: 30,
+    marginTop: 40,
     alignItems: 'center',
   },
   termsText: {
-    fontSize: 12,
+    fontSize: 16,
     color: '#999',
     textAlign: 'center',
-    lineHeight: 18,
+    lineHeight: 22,
   },
   termsLink: {
     color: '#4CAF50',

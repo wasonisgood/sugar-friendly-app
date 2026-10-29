@@ -125,6 +125,23 @@ class ScanHistoryService {
     }
   }
 
+  async updateFoodName(id: string, foodName: string): Promise<void> {
+    try {
+      const history = await this.getScanHistory();
+      const itemIndex = history.findIndex(item => item.id === id);
+
+      if (itemIndex === -1) {
+        throw new Error('Scan item not found');
+      }
+
+      history[itemIndex].analysisResult.foodName = foodName;
+      await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(history));
+    } catch (error) {
+      console.error('Error updating food name:', error);
+      throw new Error('Failed to update food name');
+    }
+  }
+
   async getStatistics(): Promise<{
     totalScans: number;
     averageScore: number;

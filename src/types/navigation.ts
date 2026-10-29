@@ -19,8 +19,20 @@ export type RootStackParamList = {
   ReviewReply: undefined;
   RevenueAnalytics: undefined;
   MerchantHelp: undefined;
-  AdvancedScanner: undefined;
   ScanHistory: undefined;
+  PrivacyPolicy: undefined;
+  TermsOfService: undefined;
+  CustomerService: undefined;
+  MerchantTerms: undefined;
+  Pricing: undefined;
+  BloodSugarTarget: undefined;
+  RestaurantGuide: undefined;
+  AIScanGuide: undefined;
+  HealthFeatures: undefined;
+  FAQ: undefined;
+  DietCalendar: undefined;
+  DietRecordDetail: { recordId: string };
+  DietAnalytics: undefined;
 };
 
 export type MainTabParamList = {
@@ -28,6 +40,7 @@ export type MainTabParamList = {
   Districts: undefined;
   Profile: undefined;
   Scanner: undefined;
+  DietCalendar: undefined;
 };
 
 export type AuthStackParamList = {

@@ -32,8 +32,20 @@ import OrderManagementScreen from '../screens/OrderManagementScreen';
 import ReviewReplyScreen from '../screens/ReviewReplyScreen';
 import RevenueAnalyticsScreen from '../screens/RevenueAnalyticsScreen';
 import MerchantHelpScreen from '../screens/MerchantHelpScreen';
-import AdvancedScannerScreen from '../screens/AdvancedScannerScreen';
 import ScanHistoryScreen from '../screens/ScanHistoryScreen';
+import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
+import TermsOfServiceScreen from '../screens/TermsOfServiceScreen';
+import CustomerServiceScreen from '../screens/CustomerServiceScreen';
+import MerchantTermsScreen from '../screens/MerchantTermsScreen';
+import PricingScreen from '../screens/PricingScreen';
+import BloodSugarTargetScreen from '../screens/BloodSugarTargetScreen';
+import RestaurantGuideScreen from '../screens/RestaurantGuideScreen';
+import AIScanGuideScreen from '../screens/AIScanGuideScreen';
+import HealthFeaturesScreen from '../screens/HealthFeaturesScreen';
+import FAQScreen from '../screens/FAQScreen';
+import DietCalendarScreen from '../screens/DietCalendarScreen';
+import DietRecordDetailScreen from '../screens/DietRecordDetailScreen';
+import DietAnalyticsScreen from '../screens/DietAnalyticsScreen';
 import WebAppNavigator from './WebAppNavigator';
 
 const RootStack = createStackNavigator<RootStackParamList>();
@@ -102,6 +114,8 @@ function MainTabNavigator() {
             iconName = focused ? 'list' : 'list-outline';
           } else if (route.name === 'Scanner') {
             iconName = focused ? 'camera' : 'camera-outline';
+          } else if (route.name === 'DietCalendar') {
+            iconName = focused ? 'calendar' : 'calendar-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           } else {
@@ -129,6 +143,11 @@ function MainTabNavigator() {
         name="Scanner"
         component={ScannerScreen}
         options={{ title: '掃描' }}
+      />
+      <MainTab.Screen
+        name="DietCalendar"
+        component={DietCalendarScreen}
+        options={{ title: '飲食' }}
       />
       <MainTab.Screen
         name="Profile"
@@ -185,8 +204,20 @@ function AppNavigatorInner() {
             <RootStack.Screen name="ReviewReply" component={ReviewReplyScreen} />
             <RootStack.Screen name="RevenueAnalytics" component={RevenueAnalyticsScreen} />
             <RootStack.Screen name="MerchantHelp" component={MerchantHelpScreen} />
-            <RootStack.Screen name="AdvancedScanner" component={AdvancedScannerScreen} />
             <RootStack.Screen name="ScanHistory" component={ScanHistoryScreen} />
+            <RootStack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+            <RootStack.Screen name="TermsOfService" component={TermsOfServiceScreen} />
+            <RootStack.Screen name="CustomerService" component={CustomerServiceScreen} />
+            <RootStack.Screen name="MerchantTerms" component={MerchantTermsScreen} />
+            <RootStack.Screen name="Pricing" component={PricingScreen} />
+            <RootStack.Screen name="BloodSugarTarget" component={BloodSugarTargetScreen} />
+            <RootStack.Screen name="RestaurantGuide" component={RestaurantGuideScreen} />
+            <RootStack.Screen name="AIScanGuide" component={AIScanGuideScreen} />
+            <RootStack.Screen name="HealthFeatures" component={HealthFeaturesScreen} />
+            <RootStack.Screen name="FAQ" component={FAQScreen} />
+            <RootStack.Screen name="DietCalendar" component={DietCalendarScreen} />
+            <RootStack.Screen name="DietRecordDetail" component={DietRecordDetailScreen} />
+            <RootStack.Screen name="DietAnalytics" component={DietAnalyticsScreen} />
           </>
         )}
       </RootStack.Navigator>

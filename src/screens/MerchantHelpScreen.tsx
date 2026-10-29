@@ -3,17 +3,21 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   ScrollView,
   Linking,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types/navigation';
+
+type MerchantHelpScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 export default function MerchantHelpScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<MerchantHelpScreenNavigationProp>();
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null);
 
   const helpCategories = [
@@ -97,17 +101,17 @@ export default function MerchantHelpScreen() {
   const quickActions = [
     {
       id: '1',
+      icon: 'chatbot',
+      title: 'AI客服',
+      subtitle: '24小時智能助手',
+      onPress: () => navigation.navigate('CustomerService'),
+    },
+    {
+      id: '2',
       icon: 'call',
       title: '客服專線',
       subtitle: '02-1234-5678',
       onPress: () => Linking.openURL('tel:0212345678'),
-    },
-    {
-      id: '2',
-      icon: 'chatbubble',
-      title: '線上客服',
-      subtitle: '週一至週五 9:00-18:00',
-      onPress: () => Alert.alert('線上客服', '線上客服功能即將推出'),
     },
     {
       id: '3',
@@ -263,17 +267,26 @@ export default function MerchantHelpScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>平台政策</Text>
           <View style={styles.policyContainer}>
-            <TouchableOpacity style={styles.policyItem}>
+            <TouchableOpacity
+              style={styles.policyItem}
+              onPress={() => navigation.navigate('MerchantTerms')}
+            >
               <Ionicons name="document-text" size={20} color="#666" />
               <Text style={styles.policyText}>商家服務條款</Text>
               <Ionicons name="chevron-forward" size={16} color="#ccc" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.policyItem}>
+            <TouchableOpacity
+              style={styles.policyItem}
+              onPress={() => navigation.navigate('PrivacyPolicy')}
+            >
               <Ionicons name="shield" size={20} color="#666" />
               <Text style={styles.policyText}>隱私政策</Text>
               <Ionicons name="chevron-forward" size={16} color="#ccc" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.policyItem}>
+            <TouchableOpacity
+              style={styles.policyItem}
+              onPress={() => navigation.navigate('Pricing')}
+            >
               <Ionicons name="card" size={20} color="#666" />
               <Text style={styles.policyText}>費用說明</Text>
               <Ionicons name="chevron-forward" size={16} color="#ccc" />
